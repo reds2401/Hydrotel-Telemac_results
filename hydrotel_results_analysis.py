@@ -11,11 +11,15 @@ Analysis of Hydrotel results:
 # %% Libraries
 import numpy as np
 import pandas as pd
-import os
-import datetime
+import matplotlib as plt
 
 import warnings
 warnings.filterwarnings("ignore")
+
+# Figure settings
+plt.rcParams["figure.dpi"] = 140
+plt.rcParams["grid.linestyle"] = '--'
+
 
 # %% Files
 
@@ -28,18 +32,30 @@ flow_grid = pd.read_csv(read_folder + file_name, sep = ';', header = 1)   # Tabl
 flow_grid = flow_grid.rename(columns = {flow_grid.columns[0]:'Dates'})    # Change the name of the first column
 
 segment = '6'                                                             # Segment for which to create the FDC
-flow_segment = flow_grid[~flow_grid['Dates'].str.contains('1990|1991')][['Dates',segment]]  # Table with flows for the segment (Deleting first 2 years of warm up)
+flow_segment = flow_grid[~flow_grid['Dates'].str.contains('1990|1991')][['Dates',segment]]  # Table with 3h flows for the segment (Deleting first 2 years of warm up)
 flow_daily = flow_segment.groupby(np.arange(len(flow_segment))//8).mean() # Calculate daily average
 dates = flow_segment['Dates'][::8].str.slice(stop=10)                     # Remove hour from date
 flow_daily.insert(0,'Dates',list(dates))                                  # Join tables
 
-# %% Build Flow-Duration curve
+# %% Build Daily Flow-Duration curve
 M = len(flow_daily)                                                       # Number of data points
-fdc_segment = flow_daily.sort_values(by=segment, axis = 0, ascending = False) # Arranging the table in descending order
-fdc_segment['n'] = [i+1 for i in list(range(M))]                          # Assigning n value
-fdc_segment['W'] = fdc_segment['n']/(M+1)                                 # Calculating Weibull's probability
+fdc_seg_dy = flow_daily.sort_values(by=segment, axis = 0, ascending = False) # Arranging the table in descending order
+fdc_seg_dy['n'] = [i+1 for i in list(range(M))]                          # Assigning n value
+fdc_seg_dy['W'] = 100*fdc_seg_dy['n']/(M+1)                             # Calculating Weibull's exceedance probability
 
-fdc_segment.plot(x = 'W', y = [segment])                                  # Plotting the result
+# Plotting the result
+fdc_seg_dy.plot(x = 'W', y = [segment], xlabel='Exceedance probability', grid=True,
+                  ylabel='Flow($m^3/s$)',legend=False, title='Daily Flow-Duration Curve')
+
+# %% Build 3 hour Flow-Duration curve
+N = len(flow_segment)                                                       # Number of data points
+fdc_seg_3h = flow_segment.sort_values(by=segment, axis = 0, ascending = False) # Arranging the table in descending order
+fdc_seg_3h['n'] = [i+1 for i in list(range(N))]                          # Assigning n value
+fdc_seg_3h['W'] = 100*fdc_seg_3h['n']/(N+1)                             # Calculating Weibull's exceedance probability
+
+# Plotting the result
+fdc_seg_3h.plot(x = 'W', y = [segment], xlabel='Exceedance probability', grid=True,
+                  ylabel='Flow($m^3/s$)',legend=False, title='3 hour Flow-Duration Curve')
 
 # %% Plot a portion of the series
 sta_date = '2005-10-01'
@@ -49,7 +65,6 @@ sta_index = flow_daily[flow_daily['Dates']==sta_date].index.values[0]
 end_index = flow_daily[flow_daily['Dates']==end_date].index.values[0]+1
 
 flow_subs = flow_daily.iloc[sta_index:end_index] # Flow subseries
-# x_label = pd.to_datetime([i for i in flow_subs['Dates']], format = "%Y-%m-%d").strftime('%Y %m %d')
 
-
-flow_subs.plot(x = 'Dates', y = [segment], rot = 90)
+flow_subs.plot(x = 'Dates', y = [segment], rot = 90, legend=False, grid=True,
+               ylabel = 'Flow($m^3/s$)', title = 'Subset of average daily flows')
