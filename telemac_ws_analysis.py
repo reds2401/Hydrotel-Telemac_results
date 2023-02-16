@@ -29,7 +29,7 @@ bathy_folders = bathy_folders[0:4]
 
 #%% Build a Dictionary results of Dataframes for each BATHYMETRY and plot them
 ws_res_dic = {}
-result_folder = '/Results_20221111/'
+result_folder = '/Results_20230215/'
 for bf in bathy_folders :
     res_folder = main_folder+bf+result_folder
     res_filelist = [cas for cas in os.listdir(res_folder)

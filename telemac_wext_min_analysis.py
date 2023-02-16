@@ -2,7 +2,7 @@
 """
 Created on Wed Sep 21 11:42:31 2022
 
-Analyze Telemac results for water extension as measured by Max depth
+Analyze Telemac results for water extension as measured by Min depth
 
 @author: reds2401
 """
@@ -22,23 +22,23 @@ bathyms = bathy_folders[0:4]
 
 #%% Build a Dictionary results of Dataframes for each BATHYMETRY and plot them
 md_res_dic = {}
-result_folder = '/Results_20221111/'
-write_folder = 'C:/Users/reds2401/OneDrive - USherbrooke/Research_project/Maps/QGIS_Model/Flood_results_202211/'
+result_folder = '/Results_20230215/'
+write_folder = 'C:/Users/reds2401/OneDrive - USherbrooke/Research_project/Maps/QGIS_Model/Flood_results_202302/'
 for bf in bathyms :
     res_folder = main_folder+bf+result_folder                                   # Results folder path
     res_filelist = [cas for cas in os.listdir(res_folder)
-                    if all(x in cas for x in ['MinDepth'])]                     # List MaxDepth files
+                    if all(x in cas for x in ['MinDepth'])]                     # List MinDepth files
     os.chdir(main_folder+bf+result_folder)                                      # Change directory to results folder
-    md_hg_dic = {}                                                              # Initialize maxdepth hydrograph dictionary for current bathymetry
-    md_df = pd.DataFrame()                                                      # Initialize maxdepth hydrograph dataframe
+    md_hg_dic = {}                                                              # Initialize mindepth hydrograph dictionary for current bathymetry
+    md_df = pd.DataFrame()                                                      # Initialize mindepth hydrograph dataframe
     for file in res_filelist:
         md_df = pd.read_csv(file, sep='\s+', header=None,
-                            skiprows=13, names = ['X', 'Y', 'Depth'])           # Read maxdepth results file
-        md_df['Depth'][md_df['Depth'] < 0] = 0                               # Make all negative and small depths to zero
+                            skiprows=13, names = ['X', 'Y', 'Depth'])           # Read mindepth results file
+        md_df['Depth'][md_df['Depth'] < 0] = 0                                  # Make all negative and small depths to zero
         md_hg_dic[file[15:-4]] = md_df                                          # Store dataframe in dictionary
-        #md_df_wo0 = md_df[~(md_df == 0).any(axis=1)]                   # MaxDepth dataframe without zeros
+        #md_df_wo0 = md_df[~(md_df == 0).any(axis=1)]                           # MinDepth dataframe without zeros
         file_name = 'Dmin_'+file[9:-4]
-        #md_df.to_csv(write_folder+file_name+'.csv',index = False)                       # Save dataframe without zeros to csv file
+        md_df.to_csv(write_folder+file_name+'.csv',index = False)              # Save dataframe without zeros to csv file
     md_res_dic[bf] = md_hg_dic
 
 
