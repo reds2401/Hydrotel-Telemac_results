@@ -37,7 +37,14 @@ flow_daily = flow_segment.groupby(np.arange(len(flow_segment))//8).mean() # Calc
 dates = flow_segment['Dates'][::8].str.slice(stop=10)                     # Remove hour from date
 flow_daily.insert(0,'Dates',list(dates))                                  # Join tables
 
-# %% Build Daily Flow-Duration curve
+# %% Daily max values
+flow_daymx = flow_segment.groupby(np.arange(len(flow_segment))//8).max()  # Calculate daily average
+flow_daymx = flow_daymx.set_index('Dates')                                # Set dates as the index
+flow_daymx.index = pd.to_datetime(flow_daymx.index)
+flow_daymx['Year'] = flow_daymx.index.year                                # Get year values as a columns
+flow_max_an = flow_daymx.groupby('Year')[segment].max()
+
+# %% Build Mean Daily Flow-Duration curve
 M = len(flow_daily)                                                       # Number of data points
 fdc_seg_dy = flow_daily.sort_values(by=segment, axis = 0, ascending = False) # Arranging the table in descending order
 fdc_seg_dy['n'] = [i+1 for i in list(range(M))]                          # Assigning n value
