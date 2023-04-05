@@ -17,7 +17,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Figure settings
-plt.rcParams["figure.dpi"] = 140
+plt.rcParams["figure.dpi"] = 150
 plt.rcParams["grid.linestyle"] = '--'
 
 
@@ -61,8 +61,18 @@ fdc_seg_3h['n'] = [i+1 for i in list(range(N))]                          # Assig
 fdc_seg_3h['W'] = 100*fdc_seg_3h['n']/(N+1)                             # Calculating Weibull's exceedance probability
 
 # Plotting the result
-fdc_seg_3h.plot(x = 'W', y = [segment], xlabel='Exceedance probability', grid=True,
-                  ylabel='Flow($m^3/s$)',legend=False, title='3 hour Flow-Duration Curve')
+fdc_seg_3h.plot(x = 'W', y = [segment], xlabel='Exceedance probability (%)', grid=True,
+                  ylabel='Flow($m^3/s$)',legend=False, color='k')
+
+# Format the plot to add a blue zone between the 20 and 80 x marks
+plt.pyplot.axvline(x=20, color='k', linestyle='--')
+plt.pyplot.axvline(x=80, color='k', linestyle='--')
+plt.pyplot.axvspan(20, 80, alpha=0.8, color='lightblue')
+plt.pyplot.text(50, 0.5*max(fdc_seg_3h[segment]), 'Regular flows', horizontalalignment='center', fontsize=12)
+plt.pyplot.text(20, fdc_seg_3h.loc[fdc_seg_3h['W'] == 20, segment].iloc[0], fdc_seg_3h.loc[fdc_seg_3h['W'] == 20, segment].iloc[0],
+                horizontalalignment='right', verticalalignment='center', color='b', fontsize=10)
+plt.pyplot.text(80, fdc_seg_3h.loc[fdc_seg_3h['W'] == 80, segment].iloc[0], fdc_seg_3h.loc[fdc_seg_3h['W'] == 80, segment].iloc[0],
+                horizontalalignment='left', verticalalignment='center', color='b', fontsize=10)
 
 # %% Plot a portion of the series
 sta_date = '2005-10-01'
