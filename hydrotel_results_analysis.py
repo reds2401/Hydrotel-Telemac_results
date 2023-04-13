@@ -69,10 +69,6 @@ plt.pyplot.axvline(x=20, color='k', linestyle='--')
 plt.pyplot.axvline(x=80, color='k', linestyle='--')
 plt.pyplot.axvspan(20, 80, alpha=0.8, color='lightblue')
 plt.pyplot.text(50, 0.5*max(fdc_seg_3h[segment]), 'Regular flows', horizontalalignment='center', fontsize=12)
-plt.pyplot.text(20, fdc_seg_3h.loc[fdc_seg_3h['W'] == 20, segment].iloc[0], fdc_seg_3h.loc[fdc_seg_3h['W'] == 20, segment].iloc[0],
-                horizontalalignment='right', verticalalignment='center', color='b', fontsize=10)
-plt.pyplot.text(80, fdc_seg_3h.loc[fdc_seg_3h['W'] == 80, segment].iloc[0], fdc_seg_3h.loc[fdc_seg_3h['W'] == 80, segment].iloc[0],
-                horizontalalignment='left', verticalalignment='center', color='b', fontsize=10)
 
 # %% Plot a portion of the series
 sta_date = '2005-10-01'
